@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Log in!{% endblock %}
+
+{% block body %}
+<div class="flex flex-column items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full">
+        <form method="post" class="mt-8">
+            <div class="rounded-md">
+                <h2 class="text-center text-3xl font-extrabold text-gray-900 mb-6">
+                    Please sign in
+                </h2>
+    {% if app.user %}
+        <div class="mb-3">
+            You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
+        </div>
+    {% endif %}
+                
+                <!-- Error Message -->
+                {% if error %}
+                    <div class="bg-red-100 border-danger text-red-700 p-2 mb-2 rounded-lg">
+                         {{ error.messageKey|trans(error.messageData, 'security') }}
+                    </div>
+                {% endif %}
+                
+                <div >
+                    <label for="inputEmail" class="sr-only">Email address</label>
+                    <input type="email" value="{{ email }}" name="email" id="inputEmail" class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Email address" autocomplete="email" required autofocus>
+                </div>
+                <div class="mb-4">
+                    <label for="inputPassword" class="sr-only">Password</label>
+                    <input type="password" name="password" id="inputPassword" class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Password" autocomplete="current-password" required>
+                </div>
+                
+                <!-- Remember Me Checkbox (Example) -->
+                <div class="flex items-center mb-4">
+                    <input id="rememberMe" name="rememberMe" type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" />
+                    <label for="rememberMe" class="ml-2 block text-sm text-gray-900">
+                        Remember me
+                    </label>
+                </div>
+            </div>
+
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+            <div>
+                <button class="btn btn-lg btn-primary w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" type="submit">
+                    Sign in
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

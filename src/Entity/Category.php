@@ -25,6 +25,10 @@ class Category
     {
         $this->posts = new ArrayCollection();
     }
+    public function __toString(): string
+    {
+        return $this->name ?? "No Category";
+    }
 
     public function getId(): ?int
     {

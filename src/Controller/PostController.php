@@ -17,7 +17,7 @@ class PostController extends AbstractController
     #[Route('/', name: 'app_post_index', methods: ['GET'])]
     public function index(PostRepository $postRepository): Response
     {
-        
+    
         return $this->render('post/index.html.twig', [
             'posts' => $postRepository->findAll(),
         ]);
@@ -29,6 +29,8 @@ class PostController extends AbstractController
         $post = new Post();
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
+        $post->setUserPost($this->getUser());
+        $post->setCreatedAt(new \DateTimeImmutable());
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($post);

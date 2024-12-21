@@ -1,18 +1,118 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
-        {% block stylesheets %}
-            {{ encore_entry_link_tags('app') }}
-        {% endblock %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Penlight{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
-        {% block javascripts %}
-            {{ encore_entry_script_tags('app') }}
-        {% endblock %}
-    </head>
-    <body>
-        {% block body %}{% endblock %}
-    </body>
+    
+    <!-- Favicon -->
+    <link 
+        rel="icon" 
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>"
+    >
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    {% block stylesheets %}
+        {{ encore_entry_link_tags('app') }}
+    {% endblock %}
+
+    <!-- JavaScripts -->
+    {% block javascripts %}
+        {{ encore_entry_script_tags('app') }}
+    {% endblock %}
+</head>
+<body class="bg-gray-50">
+
+    <!-- Navigation Bar -->
+    <nav class="bg-indigo-600 p-4 w-screen">
+        <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+            <div class="relative flex items-center justify-between h-16 w-screen">
+                
+                <!-- Mobile Menu Button -->
+                <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
+                    <button 
+                        type="button" 
+                        class="inline-flex items-center justify-center p-2 rounded-md text-white hover:text-gray-300 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" 
+                        aria-controls="mobile-menu" 
+                        aria-expanded="false"
+                    >
+                        <span class="sr-only">Open main menu</span>
+                        <svg 
+                            class="block h-6 w-6" 
+                            xmlns="http://www.w3.org/2000/svg" 
+                            fill="none" 
+                            viewBox="0 0 24 24" 
+                            stroke="currentColor" 
+                            aria-hidden="true"
+                        >
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Brand and Links -->
+                <div class="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
+                    <!-- Brand -->
+                    <a href="/" class="text-white text-xl font-bold">
+                        Penlight
+                    </a>
+                    
+                    <!-- Navigation Links -->
+                    <div class="hidden sm:block sm:ml-6">
+                        <div class="flex space-x-4">
+                            <a 
+                                href="/post/new" 
+                                class="text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            >
+                                New Post
+                            </a>
+                            <a 
+                                href="/contact" 
+                                class="text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            >
+                                Contact
+                            </a>
+                            
+                            <!-- User Authentication Links -->
+                            <div class="flex-grow"></div>
+                            {% if app.user %}
+                                <!-- Logout -->
+                                <a 
+                                    href="/logout" 
+                                    class="bg-black text-white px-4 py-2 rounded-md font-semibold hover:bg-red-700 transition ease-in-out duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                >
+                                    Logout
+                                </a>
+                            {% else %}
+                                <!-- Login -->
+                                <a 
+                                    href="/login" 
+                                    class="bg-green-600 text-white px-4 py-2 rounded-md font-semibold hover:bg-green-700 transition ease-in-out duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                                >
+                                    Login
+                                </a>
+                                <!-- Register -->
+                                <a 
+                                    href="/register" 
+                                    class="bg-blue-600 text-white px-4 py-2 rounded-md font-semibold hover:bg-blue-700 transition ease-in-out duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                >
+                                    Register
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    {% block body %}
+    {% endblock %}
+
+</body>
 </html>
