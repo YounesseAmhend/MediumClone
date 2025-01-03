@@ -3,8 +3,137 @@
 {% block title %}{{ post.title }}{% endblock %}
 
 {% block stylesheets %}
+
 {{ parent() }}
 <style>
+           #markdown-content * {
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Apply custom styles to specific elements */
+        #markdown-content h1,
+        #markdown-content h2,
+        #markdown-content h3,
+        #markdown-content h4,
+        #markdown-content h5,
+        #markdown-content h6 {
+            font-weight: bold;
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+            color: #333; /* Darker color for better readability */
+        }
+
+        #markdown-content h1 {
+            font-size: 2.25em;
+        }
+
+        #markdown-content h2 {
+            font-size: 1.75em;
+        }
+
+        #markdown-content h3 {
+            font-size: 1.5em;
+        }
+
+        #markdown-content h4 {
+            font-size: 1.25em;
+        }
+
+        #markdown-content h5 {
+            font-size: 1.1em;
+        }
+
+        #markdown-content h6 {
+            font-size: 1em;
+        }
+
+        #markdown-content p {
+            margin-bottom: 1em;
+            color: #333;
+        }
+
+        #markdown-content a {
+            color: #007bff; /* Link color */
+            text-decoration: none;
+        }
+
+        #markdown-content a:hover {
+            text-decoration: underline;
+        }
+
+        #markdown-content ul,
+        #markdown-content ol {
+            margin-left: 20px;
+            margin-bottom: 1em;
+        }
+
+        #markdown-content ul {
+            list-style-type: disc;
+        }
+
+        #markdown-content ol {
+            list-style-type: decimal;
+        }
+
+        #markdown-content li {
+            margin-bottom: 0.5em;
+        }
+
+        #markdown-content blockquote {
+            margin-left: 20px;
+            padding-left: 10px;
+            border-left: 4px solid #ccc;
+            color: #555;
+            font-style: italic;
+        }
+
+        #markdown-content pre {
+            background-color: #f4f4f4;
+            padding: 1em;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+
+        #markdown-content code {
+            font-family: 'Courier New', monospace;
+            background-color: #f4f4f4;
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+        }
+
+        #markdown-content img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        #markdown-content hr {
+            border: 0;
+            border-top: 1px solid #ccc;
+            margin: 2em 0;
+        }
+
+        #markdown-content table {
+            width: 100%;
+            margin: 1em 0;
+            border-collapse: collapse;
+        }
+
+        #markdown-content th,
+        #markdown-content td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        #markdown-content th {
+            background-color: #f8f8f8;
+            font-weight: bold;
+        }
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(20px); }
         to { opacity: 1; transform: translateY(0); }
@@ -36,9 +165,12 @@
             </div>
         </div>
         <div class="p-6">
-            <div class="prose max-w-none">
-                {{ post.content|raw }}
-            </div>
+<article id="markdown-content" class="prose lg:prose-xl max-w-none whitespace-pre-wrap break-words overflow-auto p-4">
+
+    {{ post.content|raw }}
+
+</article>
+
             {% if app.user and app.user.id == post.userPost.id %}
                 <div class="mt-6 flex justify-end space-x-4">
                     <a href="{{ path('app_post_edit', {'id': post.id}) }}" 
@@ -51,22 +183,43 @@
         </div>
     </article>
     {{ include('comment/show.html.twig', {'post': post}) }}
-
-
-
-    
 </div>
-{% endblock %}
 
-{% block javascripts %}
-{{ parent() }}
-<script>
+<!-- Add CSS for GitHub-style Markdown rendering -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify/purify.min.js"></script>
+
+<script type="module">
+
+
     document.addEventListener('DOMContentLoaded', function () {
+        // Get the raw Markdown content from the post
+        const markdownContent = document.getElementById('markdown-content').innerText;
+ 
+        marked.setOptions({
+    breaks: true,          // Enable line breaks (<br>) in paragraphs
+    gfm: true,             // Enable GitHub Flavored Markdown (e.g., task lists, tables)
+    tables: true,          // Enable table support
+    smartLists: true,      // Enable smart lists for better bullet points and ordered lists
+    smartypants: true,     // Enable smart quotes (e.g., curly quotes) and other smart punctuation
+    headerIds: false,      // Disable automatic header ID generation (or use custom IDs)
+    highlight: function (code, language) {
+        // Optional: Highlight code blocks with a syntax highlighter (e.g., Prism.js, Highlight.js)
+        if (language && hljs.getLanguage(language)) {
+            return hljs.highlight(code, { language }).value;
+        }
+        return code; // Fallback to no syntax highlighting
+    }
+});
+        const newContent = (marked.parse(markdownContent));
+
+        console.log(newContent);
+        document.getElementById('markdown-content').innerHTML =newContent;
+
         const likeButton = document.getElementById('likeButton');
         const likeCount = document.getElementById('likeCount');
         const shareButton = document.getElementById('shareButton');
 
-        let likes = 0;
 
         likeButton?.addEventListener('click', function () {
             likes++;

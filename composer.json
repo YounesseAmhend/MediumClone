@@ -13,6 +13,8 @@
         "doctrine/doctrine-bundle": "^2.13",
         "doctrine/doctrine-migrations-bundle": "^3.3",
         "doctrine/orm": "^2.12",
+        "league/commonmark": "^2.6",
+        "league/html-to-markdown": "^5.1",
         "phpdocumentor/reflection-docblock": "^5.6",
         "symfony/asset": "6.1.*",
         "symfony/console": "6.1.*",
@@ -25,6 +27,7 @@
         "symfony/http-client": "6.1.*",
         "symfony/intl": "6.1.*",
         "symfony/mailer": "6.1.*",
+        "symfony/mercure-bundle": "*",
         "symfony/mime": "6.1.*",
         "symfony/monolog-bundle": "^3.0",
         "symfony/notifier": "6.1.*",
@@ -40,7 +43,8 @@
         "symfony/validator": "6.1.*",
         "symfony/web-link": "6.1.*",
         "symfony/yaml": "6.1.*",
-        "twig/extra-bundle": "^2.12|^3.0",
+        "twig/extra-bundle": "^3.8",
+        "twig/markdown-extra": "^3.18",
         "twig/twig": "^2.12|^3.0"
     },
     "require-dev": {

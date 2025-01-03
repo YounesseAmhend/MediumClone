@@ -1,4 +1,16 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
-{{ form_end(form) }}
+<form action="{{ path('app_comment_new') }}" method="post" class="flex-1">
+
+    <input type="text" name="content" placeholder="Add a comment..." 
+           class="comment-input w-full p-2 border-b border-gray-200 focus:outline-none">
+    <div class="flex justify-end gap-2 mt-2">
+        <button type="button" class="px-4 py-2 text-gray-500 font-medium rounded-full hover:bg-gray-100">
+            Cancel
+        </button>
+        <button type="submit" class="px-4 py-2 bg-blue-500 text-white font-medium rounded-full hover:bg-blue-600">
+            {{ button_label|default('Save') }}
+        </button>
+    </div>
+
+    <input type="hidden" name="post_id" value="{{ post.id }}">
+    <input type="hidden" name="user_c" value="{{ app.user }}">
+</form>

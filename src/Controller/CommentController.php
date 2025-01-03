@@ -3,83 +3,170 @@
 namespace App\Controller;
 
 use App\Entity\Comment;
-use App\Form\CommentType;
 use App\Repository\CommentRepository;
+use App\Repository\PostRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-#[Route('/comment')]
+#[Route('/api/comments', name: 'api_comment_')]
 class CommentController extends AbstractController
 {
-    #[Route('/', name: 'app_comment_index', methods: ['GET'])]
-    public function index(CommentRepository $commentRepository): Response
+    public function __construct(
+        private EntityManagerInterface $entityManager,
+        private ValidatorInterface $validator
+    ) {}
+
+    #[Route('', name: 'list', methods: ['GET'])]
+    public function list(Request $request, CommentRepository $commentRepository): JsonResponse
     {
-        return $this->render('comment/index.html.twig', [
-            'comments' => $commentRepository->findAll(),
+        $postId = $request->query->get('postId');
+        $sort = $request->query->get('sort', 'newest');
+        $limit = $request->query->get('limit', 50);
+
+        $queryBuilder = $commentRepository->createQueryBuilder('c')
+            ->where('c.commentedPost = :postId')
+            ->setParameter('postId', $postId)
+            ->setMaxResults($limit);
+
+        if ($sort === 'oldest') {
+            $queryBuilder->orderBy('c.timestamp', 'ASC');
+        } else {
+            $queryBuilder->orderBy('c.timestamp', 'DESC');
+        }
+
+        $comments = $queryBuilder->getQuery()->getResult();
+
+        return $this->json([
+            'comments' => array_map(fn(Comment $comment) => $this->serializeComment($comment), $comments)
         ]);
     }
 
-    #[Route('/new', name: 'app_comment_new', methods: ['POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('', name: 'create', methods: ['POST'])]
+    public function create(Request $request, PostRepository $postRepository): JsonResponse
     {
-        $comment = new Comment();
-        $form = $this->createForm(CommentType::class, $comment);
-        $form->handleRequest($request);
-        $post_id = $form->get('commentedPost')->getData()->getId();
+        try {
+            $data = json_decode($request->getContent(), true);
 
-        if ($post_id == null) {
-            return $this->redirectToRoute('app_login');
+            if (!isset($data['postId']) || !isset($data['content'])) {
+                return $this->json(['error' => 'Missing required fields'], Response::HTTP_BAD_REQUEST);
+            }
+
+            $post = $postRepository->find($data['postId']);
+            if (!$post) {
+                return $this->json(['error' => 'Post not found'], Response::HTTP_NOT_FOUND);
+            }
+
+            $comment = new Comment();
+            $comment->setCommentedPost($post)
+                ->setContent($data['content'])
+                ->setUserC($this->getUser())
+                ->setTimestamp(new \DateTimeImmutable());
+
+            $errors = $this->validator->validate($comment);
+            if (count($errors) > 0) {
+                return $this->json(['error' => (string) $errors], Response::HTTP_BAD_REQUEST);
+            }
+
+            $this->entityManager->persist($comment);
+            $this->entityManager->flush();
+
+            return $this->json(
+                $this->serializeComment($comment),
+                Response::HTTP_CREATED
+            );
+        } catch (\Exception $e) {
+            return $this->json(['error' => 'Server error'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+    #[Route('/{id}', name: 'update', methods: ['PUT'])]
+    public function update(
+        int $id,
+        Request $request,
+        CommentRepository $commentRepository,
+        PostRepository $postRepository
+    ): JsonResponse {
+        try {
+            // Fetch the comment entity from the database
+            $comment = $commentRepository->find($id);
+            if (!$comment) {
+                return $this->json(['error' => 'Comment not found'], Response::HTTP_NOT_FOUND);
+            }
 
+            // Get the data from the request
+            $data = json_decode($request->getContent(), true);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($comment);
-            $entityManager->flush();
+            // Update fields based on request data
+            if (isset($data['content'])) {
+                $comment->setContent($data['content']);
+            }
 
+            // Optional: update other fields, such as the post or timestamp
+            if (isset($data['postId'])) {
+                $post = $postRepository->find($data['postId']);
+                if ($post) {
+                    $comment->setCommentedPost($post);
+                } else {
+                    return $this->json(['error' => 'Post not found'], Response::HTTP_NOT_FOUND);
+                }
+            }
 
-            return $this->redirectToRoute('app_post_show', ['id' => $post_id], Response::HTTP_SEE_OTHER);
+            // Validate the updated comment
+            $errors = $this->validator->validate($comment);
+            if (count($errors) > 0) {
+                return $this->json(['error' => (string) $errors], Response::HTTP_BAD_REQUEST);
+            }
+
+            // Persist the updated comment
+            $this->entityManager->flush();
+
+            return $this->json(
+                $this->serializeComment($comment),
+                Response::HTTP_OK
+            );
+        } catch (\Exception $e) {
+            return $this->json(['error' => 'Server error'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        return $this->redirectToRoute('app_post_show', ['id' => $post_id], Response::HTTP_SEE_OTHER);
-
     }
 
-    #[Route('/{id}', name: 'app_comment_show', methods: ['GET'])]
-    public function show(Comment $comment): Response
-    {
-        return $this->render('comment/show.html.twig', [
-            'comment' => $comment,
-        ]);
-    }
+    #[Route('/{id}', name: 'app_comment_delete', methods: ['DELETE'])]
+    public function delete(
+        int $id,
+        CommentRepository $commentRepository
+    ): JsonResponse {
+        try {
+            // Fetch the comment entity from the database
+            $comment = $commentRepository->find($id);
+            if (!$comment) {
+                return $this->json(['error' => 'Comment not found'], Response::HTTP_NOT_FOUND);
+            }
 
-    #[Route('/{id}/edit', name: 'app_comment_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Comment $comment, EntityManagerInterface $entityManager): Response
-    {
-        $form = $this->createForm(CommentType::class, $comment);
-        $form->handleRequest($request);
+            // Remove the comment from the database
+            $this->entityManager->remove($comment);
+            $this->entityManager->flush();
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_comment_index', [], Response::HTTP_SEE_OTHER);
+            return $this->json(['message' => 'Comment deleted successfully'], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return $this->json(['error' => 'Server error'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-
-        return $this->renderForm('comment/edit.html.twig', [
-            'comment' => $comment,
-            'form' => $form,
-        ]);
     }
-
-    #[Route('/{id}', name: 'app_comment_delete', methods: ['POST'])]
-    public function delete(Request $request, Comment $comment, EntityManagerInterface $entityManager): Response
+    private function serializeComment(Comment $comment): array
     {
-        if ($this->isCsrfTokenValid('delete'.$comment->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($comment);
-            $entityManager->flush();
-        }
-
-        return $this->redirectToRoute('app_comment_index', [], Response::HTTP_SEE_OTHER);
+        return [
+            'id' => $comment->getId(),
+            'content' => $comment->getContent(),
+            'timestamp' => $comment->getTimestamp() ? $comment->getTimestamp()->format(\DateTime::ATOM) : null,
+            'user' => [
+                'id' => $comment->getUserC()->getId(),
+                'username' => $comment->getUserC()->getUsername(),
+            ],
+            'post' => [
+                'id' => $comment->getCommentedPost()->getId()
+            ]
+        ];
     }
 }

@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Post;
 use App\Form\PostType;
+use App\Form\CommentType;
 use App\Repository\PostRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -54,7 +55,7 @@ class PostController extends AbstractController
     {
         $post = $postRepository->find($id);
         $comments = $post->getComments();
-
+        $comment_form = $this->createForm(CommentType::class);
         if (!$post) {
             throw $this->createNotFoundException('Post not found.');
         }
@@ -62,6 +63,7 @@ class PostController extends AbstractController
         return $this->render('post/show.html.twig', [
             'post' => $post,
             'comments' => $comments,
+            'comment_form' => $comment_form->createView(),
         ]);
     }
 
