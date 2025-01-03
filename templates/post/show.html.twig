@@ -1,34 +1,90 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Post{% endblock %}
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in {
+        animation: fadeIn 0.5s ease-out;
+    }
+</style>
+{% endblock %}
 
 {% block body %}
-    <h1>Post</h1>
+<div class="max-w-4xl mx-auto px-4 py-12 fade-in space-y-12">
+    <!-- Post Content -->
+    <article class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 p-6 text-white">
+            <h1 class="text-3xl md:text-4xl font-bold">{{ post.title }}</h1>
+            <div class="mt-4 flex items-center gap-4">
+                <img src="{{ asset('images/default-avatar.jpg') }}" alt="{{ post.userPost.username }}" class="w-12 h-12 rounded-full">
+                <div>
+                    <p class="font-medium">{{ post.userPost.username }}</p>
+                    {% if post.createdAt %}
+                        <time datetime="{{ post.createdAt|date('Y-m-d H:i') }}" class="text-sm opacity-75">
+                            {{ post.createdAt|date('d M Y \\a\\t H:i') }}
+                        </time>
+                    {% else %}
+                        <p class="text-sm opacity-75">(Date not available)</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="p-6">
+            <div class="prose max-w-none">
+                {{ post.content|raw }}
+            </div>
+            {% if app.user and app.user.id == post.userPost.id %}
+                <div class="mt-6 flex justify-end space-x-4">
+                    <a href="{{ path('app_post_edit', {'id': post.id}) }}" 
+                       class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition">
+                        Edit Post
+                    </a>
+                    {{ include('post/_delete_form.html.twig', {'button_class': 'bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition'}) }}
+                </div>
+            {% endif %}
+        </div>
+    </article>
+    {{ include('comment/show.html.twig', {'post': post}) }}
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ post.id }}</td>
-            </tr>
-            <tr>
-                <th>Title</th>
-                <td>{{ post.title }}</td>
-            </tr>
-            <tr>
-                <th>Content</th>
-                <td>{{ post.content }}</td>
-            </tr>
-            <tr>
-                <th>CreatedAt</th>
-                <td>{{ post.createdAt ? post.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-        </tbody>
-    </table>
 
-    <a href="{{ path('app_post_index') }}">back to list</a>
 
-    <a href="{{ path('app_post_edit', {'id': post.id}) }}">edit</a>
+    
+</div>
+{% endblock %}
 
-    {{ include('post/_delete_form.html.twig') }}
+{% block javascripts %}
+{{ parent() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const likeButton = document.getElementById('likeButton');
+        const likeCount = document.getElementById('likeCount');
+        const shareButton = document.getElementById('shareButton');
+
+        let likes = 0;
+
+        likeButton?.addEventListener('click', function () {
+            likes++;
+            likeCount.textContent = likes;
+            likeButton.classList.add('text-pink-500');
+        });
+
+        shareButton?.addEventListener('click', function () {
+            if (navigator.share) {
+                navigator.share({
+                    title: '{{ post.title }}',
+                    text: 'Check out this awesome post!',
+                    url: window.location.href
+                }).catch(console.error);
+            } else {
+                alert('Web Share API not supported in your browser');
+            }
+        });
+    });
+</script>
 {% endblock %}

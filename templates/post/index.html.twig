@@ -14,7 +14,7 @@
                     <div class="p-6">
                         <div class="flex items-center justify-between mb-4">
                             <div class="flex items-center">
-                                <img class="h-10 w-10 rounded-full mr-3" src="{{ asset('images/default-avatar.png') }}" alt="{{ post.userPost.username }}'s avatar">
+                                <img class="h-10 w-10 rounded-full mr-3" src="{{ asset('images/default-avatar.jpg') }}" alt="{{ post.userPost.username }}'s avatar">
                                 <div>
                                     <h2 class="font-semibold text-gray-800">{{ post.userPost.username }}</h2>
                                     <p class="text-xs text-gray-500">
@@ -55,6 +55,7 @@
                                 </div>
                             </div>
                         </div>
+                        <a href="{{ path('app_post_show', {'id': post.id}) }}" class="block group">
 
                         <h3 class="text-xl font-bold mb-3 text-gray-800">{{ post.title }}</h3>
 
@@ -67,7 +68,7 @@
                                 </a>
                             {% endif %}
                         </div>
-
+                        </a>
                         <div class="flex items-center text-sm text-gray-500 mb-4">
                             <span class="bg-gray-200 rounded-full px-3 py-1">{{ post.postCategory }}</span>
                         </div>
@@ -88,6 +89,7 @@
                         </div>
                     </div>
                 </article>
+           
             {% endfor %}
         </div>
     {% else %}

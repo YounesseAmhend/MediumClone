@@ -10,6 +10,8 @@ use Symfony\Component\Security\Core\Security;
 
 class HomeController extends AbstractController
 {
+
+
     #[Route('/', name: 'app_home')]
     public function index(Security $security, PostRepository $postRepository): Response
     {

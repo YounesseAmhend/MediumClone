@@ -1,30 +1,96 @@
-{% extends 'base.html.twig' %}
 
-{% block title %}Comment{% endblock %}
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+    .comment-reply { margin-left: 48px; }
+    .like-active { color: #065fd4; }
+    .comment-input:focus { border-bottom-color: #065fd4; }
+</style>
 
-{% block body %}
-    <h1>Comment</h1>
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <div class="flex items-center gap-4 mb-8">
+        <h2 class="text-xl font-bold">Comments</h2>
+        <span class="text-gray-600">{{ comments|length }} comments</span>
+    </div>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ comment.id }}</td>
-            </tr>
-            <tr>
-                <th>Content</th>
-                <td>{{ comment.content }}</td>
-            </tr>
-            <tr>
-                <th>Timestamp</th>
-                <td>{{ comment.timestamp ? comment.timestamp|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-        </tbody>
-    </table>
+    {% if app.user %}
+        <div class="flex gap-4 mb-8">
+            <img src="{{ app.user.avatarUrl|default(asset('images/default-avatar.jpg')) }}" 
+                 alt="User avatar" class="w-10 h-10 rounded-full">
+            <form action="{{ path('app_comment_new') }}" method="post" class="flex-1">
+                <input type="text" name="content" placeholder="Add a comment..." 
+                       class="comment-input w-full p-2 border-b border-gray-200 focus:outline-none">
+                <div class="flex justify-end gap-2 mt-2">
+                    <button type="button" class="px-4 py-2 text-gray-500 font-medium rounded-full hover:bg-gray-100">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white font-medium rounded-full hover:bg-blue-600">
+                        Comment
+                    </button>
+                </div>
+                <input type="hidden" name="commentedPost" value="{{ post }}">
+                <input type="hidden" name="user_c" value="{{ app.user }}">
 
-    <a href="{{ path('app_comment_index') }}">back to list</a>
+            </form>
+        </div>
+    {% endif %}
 
-    <a href="{{ path('app_comment_edit', {'id': comment.id}) }}">edit</a>
+    <div class="space-y-6">
+        {% for comment in comments %}
+            <div class="flex gap-4">
+                <img src="{{ comment.user.avatarUrl|default(asset('images/default-avatar.jpg')) }}" 
+                     alt="{{ comment.user.username }}" class="w-10 h-10 rounded-full">
+                <div class="flex-1">
+                    <div class="flex items-center gap-2">
+                        <span class="font-medium">{{ comment.user.username }}</span>
+                        <span class="text-sm text-gray-500">
+                            {{ comment.timestamp ? comment.timestamp|date('Y-m-d H:i:s') : '' }}
+                        </span>
+                    </div>
+                    <p class="mt-1">{{ comment.content }}</p>
+                    
+                    <div class="flex items-center gap-4 mt-2">
+                        <button class="flex items-center gap-1 text-gray-500 hover:text-gray-700" 
+                                data-comment-id="{{ comment.id }}">
+                            <span class="material-icons text-sm">thumb_up</span>
+                            <span class="like-count">{{ comment.likes|default(0) }}</span>
+                        </button>
+                        <button class="flex items-center gap-1 text-gray-500 hover:text-gray-700">
+                            <span class="material-icons text-sm">thumb_down</span>
+                        </button>
+                        <button class="text-gray-500 hover:text-gray-700 font-medium reply-button" 
+                                data-comment-id="{{ comment.id }}">Reply</button>
+                    </div>
 
-    {{ include('comment/_delete_form.html.twig') }}
-{% endblock %}
+                        
+            
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Toggle replies
+    document.querySelectorAll('.toggle-replies').forEach(button => {
+        button.addEventListener('click', function() {
+            const commentId = this.dataset.commentId;
+            const repliesContainer = this.nextElementSibling;
+            const icon = this.querySelector('.material-icons');
+            
+            repliesContainer.classList.toggle('hidden');
+            icon.textContent = repliesContainer.classList.contains('hidden') ? 'expand_more' : 'expand_less';
+        });
+    });
+
+    // Like functionality
+    document.querySelectorAll('[data-comment-id]').forEach(button => {
+        button.addEventListener('click', function() {
+            const likeCount = this.querySelector('.like-count');
+            const currentLikes = parseInt(likeCount.textContent);
+            likeCount.textContent = currentLikes + 1;
+            this.classList.add('like-active');
+        });
+    });
+});
+</script>

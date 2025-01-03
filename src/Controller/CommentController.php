@@ -22,24 +22,28 @@ class CommentController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_comment_new', methods: ['GET', 'POST'])]
+    #[Route('/new', name: 'app_comment_new', methods: ['POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $comment = new Comment();
         $form = $this->createForm(CommentType::class, $comment);
         $form->handleRequest($request);
+        $post_id = $form->get('commentedPost')->getData()->getId();
+
+        if ($post_id == null) {
+            return $this->redirectToRoute('app_login');
+        }
+
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($comment);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_comment_index', [], Response::HTTP_SEE_OTHER);
-        }
 
-        return $this->renderForm('comment/new.html.twig', [
-            'comment' => $comment,
-            'form' => $form,
-        ]);
+            return $this->redirectToRoute('app_post_show', ['id' => $post_id], Response::HTTP_SEE_OTHER);
+        }
+        return $this->redirectToRoute('app_post_show', ['id' => $post_id], Response::HTTP_SEE_OTHER);
+
     }
 
     #[Route('/{id}', name: 'app_comment_show', methods: ['GET'])]

@@ -1,13 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-gray-50">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Penlight{% endblock %}</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    
+
     <!-- Favicon -->
     <link 
         rel="icon" 
@@ -25,94 +26,92 @@
         {{ encore_entry_script_tags('app') }}
     {% endblock %}
 </head>
-<body class="bg-gray-50">
-
-    <!-- Navigation Bar -->
-    <nav class="bg-indigo-600 p-4 w-screen">
-        <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
-            <div class="relative flex items-center justify-between h-16 w-screen">
-                
-                <!-- Mobile Menu Button -->
-                <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
-                    <button 
-                        type="button" 
-                        class="inline-flex items-center justify-center p-2 rounded-md text-white hover:text-gray-300 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" 
-                        aria-controls="mobile-menu" 
-                        aria-expanded="false"
-                    >
-                        <span class="sr-only">Open main menu</span>
-                        <svg 
-                            class="block h-6 w-6" 
-                            xmlns="http://www.w3.org/2000/svg" 
-                            fill="none" 
-                            viewBox="0 0 24 24" 
-                            stroke="currentColor" 
-                            aria-hidden="true"
-                        >
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                        </svg>
-                    </button>
-                </div>
-                
-                <!-- Brand and Links -->
-                <div class="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
-                    <!-- Brand -->
-                    <a href="/" class="text-white text-xl font-bold">
-                        Penlight
-                    </a>
-                    
-                    <!-- Navigation Links -->
-                    <div class="hidden sm:block sm:ml-6">
-                        <div class="flex space-x-4">
-                            <a 
-                                href="/post/new" 
-                                class="text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                            >
-                                New Post
-                            </a>
-                            <a 
-                                href="/contact" 
-                                class="text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                            >
-                                Contact
-                            </a>
-                            
-                            <!-- User Authentication Links -->
-                            <div class="flex-grow"></div>
+<body class="h-full">
+    <div class="min-h-full">
+        <!-- Navigation Bar -->
+        <nav class="bg-indigo-600">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="flex h-16 items-center justify-between">
+                    <div class="flex items-center">
+                        <!-- Brand -->
+                        <a href="/" class="text-white text-xl font-bold">
+                            Penlight
+                        </a>
+                        <!-- Navigation Links (Desktop) -->
+                        <div class="hidden md:block">
+                            <div class="ml-10 flex items-baseline space-x-4">
+                                <a href="/post/new" class="text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">New Post</a>
+                                <a href="/contact" class="text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Contact</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- User Authentication Links (Desktop) -->
+                    <div class="hidden md:block">
+                        <div class="ml-4 flex items-center md:ml-6">
                             {% if app.user %}
-                                <!-- Logout -->
-                                <a 
-                                    href="/logout" 
-                                    class="bg-black text-white px-4 py-2 rounded-md font-semibold hover:bg-red-700 transition ease-in-out duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                                >
-                                    Logout
-                                </a>
+                                <a href="/logout" class="bg-black text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-red-700 transition ease-in-out duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">Logout</a>
                             {% else %}
-                                <!-- Login -->
-                                <a 
-                                    href="/login" 
-                                    class="bg-green-600 text-white px-4 py-2 rounded-md font-semibold hover:bg-green-700 transition ease-in-out duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                                >
-                                    Login
-                                </a>
-                                <!-- Register -->
-                                <a 
-                                    href="/register" 
-                                    class="bg-blue-600 text-white px-4 py-2 rounded-md font-semibold hover:bg-blue-700 transition ease-in-out duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                >
-                                    Register
-                                </a>
+                                <a href="/login" class="bg-green-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-green-700 transition ease-in-out duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 mr-2">Login</a>
+                                <a href="/register" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 transition ease-in-out duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Register</a>
                             {% endif %}
                         </div>
                     </div>
+                    <!-- Mobile menu button -->
+                    <div class="-mr-2 flex md:hidden">
+                        <button type="button" class="inline-flex items-center justify-center rounded-md bg-indigo-700 p-2 text-white hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600" aria-controls="mobile-menu" aria-expanded="false">
+                            <span class="sr-only">Open main menu</span>
+                            <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                            <svg class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
-    </nav>
 
-    <!-- Main Content -->
-    {% block body %}
-    {% endblock %}
+            <!-- Mobile menu, show/hide based on menu state. -->
+            <div class="md:hidden" id="mobile-menu">
+                <div class="space-y-1 px-2 pt-2 pb-3 sm:px-3">
+                    {% if app.user %}
 
+                        <a href="/post/new" class="text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-indigo-700">New Post</a>
+                        <a href="/contact" class="text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-indigo-700">Contact</a>
+                    {% endif %}
+
+                </div>
+                <div class="border-t border-indigo-700 p-3">
+                    <div class="flex-row  space-y-3">
+                        {% if app.user %}
+                            <a href="/logout" class="block w-full bg-black text-white px-4 py-2 rounded-md text-base font-semibold hover:bg-red-700 transition ease-in-out duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 text-center">Logout</a>
+                        {% else %}
+                            <a href="/login" class="block w-full bg-green-600 text-white px-4 py-2 rounded-md text-base font-semibold hover:bg-green-700 transition ease-in-out duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 text-center">Login</a>
+                            <a href="/register" class="block w-full bg-blue-600 text-white px-4 py-2 rounded-md text-base font-semibold hover:bg-blue-700 transition ease-in-out duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 text-center">Register</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main>
+            <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
+                {% block body %}{% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Toggle mobile menu
+        document.querySelector('button[aria-controls="mobile-menu"]').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const expanded = this.getAttribute('aria-expanded') === 'true';
+            this.setAttribute('aria-expanded', String(!expanded));
+            mobileMenu.classList.toggle('hidden');
+            this.querySelector('svg.block').classList.toggle('hidden');
+            this.querySelector('svg.hidden').classList.toggle('hidden');
+        });
+    </script>
 </body>
 </html>

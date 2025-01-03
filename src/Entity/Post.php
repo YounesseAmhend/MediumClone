@@ -113,6 +113,10 @@ class Post
     {
         return $this->comments;
     }
+    public function __toString(): string
+    {
+        return $this->title ?? "Unnamed Post";
+    }
 
     public function addComment(Comment $comment): static
     {
